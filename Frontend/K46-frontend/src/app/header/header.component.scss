@@ -1,0 +1,12 @@
+.top-menu {
+  display: flex;
+  justify-content: space-between;
+  background-color: #007bff;
+  padding: 10px;
+}
+.top-menu a,
+.top-menu button {
+  color: white;
+  margin-right: 10px;
+  text-decoration: none;
+}

@@ -11,16 +11,20 @@ const jwtSecret = process.env.JWT_SECRET || 'your_jwt_secret';
 
 router.post('/login', (req, res) => {
   const { username, password } = req.body;
+  console.log("Received username:", username);
+  console.log("Received password:", password);
 
   // Check if the provided username and password match the hardcoded credentials
   if (username === hardcodedUsername && password === hardcodedPassword) {
     // Generate JWT token
     const token = jwt.sign({ username }, jwtSecret, { expiresIn: '1h' });
+    console.log("Token generated:", token);
 
     // Send token back to the client
     res.json({ token });
   } else {
     // Send an error if credentials do not match
+    console.log("Invalid credentials");
     res.status(401).json({ message: 'Invalid username or password' });
   }
 });
