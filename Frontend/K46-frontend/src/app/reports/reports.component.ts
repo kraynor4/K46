@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { ChartService } from '../services/chart.service';
 import * as d3 from 'd3';
 
@@ -7,8 +7,9 @@ import * as d3 from 'd3';
   templateUrl: './reports.component.html',
   styleUrls: ['./reports.component.scss']
 })
-export class ReportsComponent implements OnInit {
+export class ReportsComponent implements OnInit, AfterViewInit {
   @ViewChild('chart', { static: true }) private chartContainer!: ElementRef;
+  @ViewChild('legendContainer', { static: false }) private legendContainer!: ElementRef; // Ensure legendContainer loads with view
   private svg: any;
   private margin = { top: 50, right: 30, bottom: 50, left: 50 };
   private width = 800 - this.margin.left - this.margin.right;
@@ -26,11 +27,13 @@ export class ReportsComponent implements OnInit {
       data => {
         if (data && data.benchmarks) {
           this.reportData = data.benchmarks;
-          this.chartTitle = data.title; // Retrieve title from the data
+          this.chartTitle = data.title;
           this.createSvg();
           this.createScales();
           this.createChartTitle();
           this.drawLineChart();
+
+          // Call createLegend here after data has been set
           this.createLegend();
         } else {
           console.error('Error: Received empty or invalid data:', data);
@@ -42,31 +45,40 @@ export class ReportsComponent implements OnInit {
     );
   }
 
+  ngAfterViewInit(): void {
+    // Ensure createLegend is called only if reportData is available
+    if (this.reportData) {
+      this.createLegend();
+    }
+  }
+
   private createSvg(): void {
     this.svg = d3.select(this.chartContainer.nativeElement)
       .append("svg")
-      .attr("width", this.width + this.margin.left + this.margin.right)
+      .attr("width", "100%") // Make the SVG responsive
       .attr("height", this.height + this.margin.top + this.margin.bottom)
+      .attr("viewBox", `0 0 ${this.width + this.margin.left + this.margin.right} ${this.height + this.margin.top + this.margin.bottom}`)
+      .attr("preserveAspectRatio", "xMidYMid meet") // Center the chart
       .append("g")
       .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`);
   }
 
   private createScales(): void {
-    const years = this.reportData[0].performance.map((d: any) => d.year);
-    const allValues = this.reportData.flatMap((d: any) => d.performance.map((p: any) => p.percentage));
+    // Convert each year and percentage to a number explicitly
+    const years = this.reportData[0].performance.map((d: any) => Number(d.year));
+    const allValues = this.reportData.flatMap((d: any) => d.performance.map((p: any) => Number(p.percentage)));
 
-    // Check and assert types for xScale
-    const xExtent = d3.extent(years) as [number, number] | [undefined, undefined];
-    const xDomain: [number, number] = [xExtent[0] ?? 0, xExtent[1] ?? 0]; // Use 0 as fallback if undefined
-
+    // Use d3.extent with type assertion for the xScale domain
+    const xExtent = d3.extent(years).map(d => Number(d)) as [number, number];
     this.xScale = d3.scaleLinear()
-      .domain(xDomain)
+      .domain(xExtent)
       .range([0, this.width]);
 
-    // Check and assert types for yScale
-    const maxYValue = d3.max(allValues) as number | undefined;
-    const yMax = maxYValue ?? 100; // Fallback to 100 if undefined
-
+    // Use d3.max with type assertion for yScale domain
+    const yMax = Number(d3.max(allValues.map((d: number) => Number(d))) ?? 0);
+    if (yMax === undefined) {
+      throw new Error('Unable to determine maximum value for yScale');
+    }
     this.yScale = d3.scaleLinear()
       .domain([0, yMax])
       .nice()
@@ -74,25 +86,26 @@ export class ReportsComponent implements OnInit {
 
     // Define color scale for different benchmarks
     this.color = d3.scaleOrdinal(d3.schemeCategory10)
-      .domain(this.reportData.map((d: any) => d.name));
+    .domain(this.reportData.map((d: any) => d.name));
   }
+
 
   private createChartTitle(): void {
     this.svg.append("text")
-      .attr("x", this.width / 2)
-      .attr("y", -this.margin.top / 2)
+      .attr("class", "chart-title") // Add class for SCSS styling
+      .attr("x", this.width / 2) // Center title horizontally
+      .attr("y", -this.margin.top / 2) // Position title above the chart
       .attr("text-anchor", "middle")
-      .attr("class", "chart-title")
+      .style("font-size", "16px")
+      .style("font-weight", "bold")
       .text(this.chartTitle);
   }
 
   private drawLineChart(): void {
-    // Line generator
     const line = d3.line()
       .x((d: any) => this.xScale(d.year))
       .y((d: any) => this.yScale(d.percentage));
 
-    // Add lines for each benchmark
     this.reportData.forEach((benchmark: any) => {
       this.svg.append("path")
         .datum(benchmark.performance)
@@ -102,36 +115,40 @@ export class ReportsComponent implements OnInit {
         .attr("d", line);
     });
 
-    // Add x-axis
     this.svg.append("g")
       .attr("transform", `translate(0, ${this.height})`)
-      .call(d3.axisBottom(this.xScale).tickFormat((d: any) => d3.format("d")(d as number)));
+      .call(d3.axisBottom(this.xScale).tickFormat((d: any) => d.toString()));
 
-    // Add y-axis
     this.svg.append("g")
       .call(d3.axisLeft(this.yScale));
   }
 
   private createLegend(): void {
-    const legend = this.svg.append("g")
-      .attr("class", "legend")
-      .attr("transform", `translate(${this.width - 150}, 0)`);
+    if (!this.reportData) return;
 
-    this.reportData.forEach((benchmark: any, i: number) => {
-      const legendRow = legend.append("g")
-        .attr("transform", `translate(0, ${i * 20})`);
+    // Clear any existing legend content
+    d3.select(this.legendContainer.nativeElement).selectAll('*').remove();
 
-      legendRow.append("rect")
-        .attr("width", 10)
-        .attr("height", 10)
-        .attr("fill", this.color(benchmark.name));
+    const legend = d3.select(this.legendContainer.nativeElement)
+      .append("div")
+      .attr("class", "legend-box");
 
-      legendRow.append("text")
-        .attr("x", 20)
-        .attr("y", 10)
+    // Add each legend item with matching color
+    this.reportData.forEach((benchmark: any) => {
+      const color = this.color(benchmark.name); // Fetch color for the legend item
+      console.log(`Legend color for ${benchmark.name}: ${color}`); // Debug: Log the color
+
+      const legendItem = legend.append("div").attr("class", "legend-item");
+
+      legendItem.append("div")
+        .attr("class", "legend-color-box")
+        .style("background-color", color) // Apply color from color scale
+        .style("fill", color) // Backup for SVG and div elements
+        .style("border", `1px solid ${color}`); // Additional border to reinforce visibility
+
+      legendItem.append("span")
         .attr("class", "legend-text")
-        .text(benchmark.name)
-        .style("font-size", "12px");
+        .text(benchmark.name);
     });
   }
 }

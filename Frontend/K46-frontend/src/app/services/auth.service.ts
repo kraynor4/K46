@@ -12,7 +12,7 @@ interface LoginResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/auth'; // backend URL
+  private apiUrl = 'https://localhost:3000/auth'; // backend URL
   private jwtHelper = new JwtHelperService();
 
   constructor(private http: HttpClient) { }
