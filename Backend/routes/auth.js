@@ -1,15 +1,18 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
+const dotenv = require('dotenv');
 
-// Hardcoded credentials (use your first name for both username and password)
-const hardcodedUsername = 'Kendra'; // Replace with your first name
-const hardcodedPassword = 'Kendra'; // Replace with your first name
+dotenv.config(); // Ensure environment variables are loaded
 
-// JWT secret key (store this in .env for production)
+// Use environment variables for credentials
+const hardcodedUsername = process.env.AUTH_USERNAME; // Add this to your .env file
+const hardcodedPassword = process.env.AUTH_PASSWORD; // Add this to your .env file
+
 const jwtSecret = process.env.JWT_SECRET || 'your_jwt_secret';
 
 router.post('/login', (req, res) => {
+  console.log('Login request received');
   const { username, password } = req.body;
   console.log("Received username:", username);
   console.log("Received password:", password);

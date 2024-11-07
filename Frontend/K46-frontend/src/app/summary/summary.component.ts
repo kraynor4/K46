@@ -46,10 +46,11 @@ export class SummaryComponent implements OnInit {
 
   private createChartTitle(): void {
     this.svg.append("text")
-      .attr("class", "chart-title") // Add class for SCSS styling
+      .attr("class", "chart-title")
       .attr("x", 0)
-      .attr("y", -this.height / 2 - this.margin / 2) // Position title above the chart
+      .attr("y", -this.height / 2 - this.margin / 2)
       .attr("text-anchor", "middle")
+      .attr("aria-hidden", "true") // Make sure the visual title doesn't interfere with screen readers
       .text(this.chartTitle);
   }
 

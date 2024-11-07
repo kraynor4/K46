@@ -1,15 +1,27 @@
+// Screen reader only text
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
 // Overall Layout Styling
 .dashboard-container {
   padding: 20px;
-  background-color: #f8f8f8; // Light background for readability
+  background-color: #f8f8f8;
   max-width: 800px;
-  margin: 0 auto; // Center the content
+  margin: 0 auto;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); // Subtle shadow for depth
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 // Section Titles
-.dashboard-container p:first-of-type {
+.section-title {
   font-size: 24px;
   font-weight: bold;
   color: #333;
@@ -22,17 +34,6 @@
   line-height: 1.8;
   color: #555;
   margin-bottom: 15px;
-}
-
-// Highlighted Section Title (e.g., "What’s your Project about?")
-.section-title {
-  font-size: 20px;
-  font-weight: bold;
-  color: #4caf50;
-  margin-top: 20px;
-  margin-bottom: 8px;
-  border-left: 4px solid #4caf50; // Accent border
-  padding-left: 10px;
 }
 
 // Reference URL Styling
@@ -49,17 +50,7 @@
   }
 }
 
-// Tech Stack Section Styling
-.tech-stack {
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
-  margin-top: 20px;
-  border-bottom: 2px solid #4caf50;
-  padding-bottom: 5px;
-}
-
-// Body Text
+// Body Text Styling
 .body-text {
   font-size: 16px;
   line-height: 1.8;

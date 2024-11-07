@@ -86,9 +86,8 @@ export class ReportsComponent implements OnInit, AfterViewInit {
 
     // Define color scale for different benchmarks
     this.color = d3.scaleOrdinal(d3.schemeCategory10)
-    .domain(this.reportData.map((d: any) => d.name));
+      .domain(this.reportData.map((d: any) => d.name));
   }
-
 
   private createChartTitle(): void {
     this.svg.append("text")
@@ -106,21 +105,50 @@ export class ReportsComponent implements OnInit, AfterViewInit {
       .x((d: any) => this.xScale(d.year))
       .y((d: any) => this.yScale(d.percentage));
 
+      // Add title to the SVG for screen readers
+  this.svg.append("title").text("AI performance benchmarks over time");
+
+    // Draw the line chart for each benchmark
     this.reportData.forEach((benchmark: any) => {
       this.svg.append("path")
         .datum(benchmark.performance)
         .attr("fill", "none")
         .attr("stroke", this.color(benchmark.name))
         .attr("stroke-width", 2)
-        .attr("d", line);
+        .attr("d", line)
+        .attr("tabindex", "0")
+        .attr("aria-label", `Line chart showing performance for ${benchmark.name}`);
     });
 
+    // Add x-axis
     this.svg.append("g")
-      .attr("transform", `translate(0, ${this.height})`)
-      .call(d3.axisBottom(this.xScale).tickFormat((d: any) => d.toString()));
+    .attr("transform", `translate(0, ${this.height})`)
+    .call(d3.axisBottom(this.xScale).tickFormat((d: any) => d.toString()))
+    .attr("aria-hidden", "true"); // Hide axes from screen readers if not essential
 
+    // Add y-axis
     this.svg.append("g")
-      .call(d3.axisLeft(this.yScale));
+    .call(d3.axisLeft(this.yScale))
+    .attr("aria-hidden", "true");
+
+    // Add a dashed line at y = 100
+    this.svg.append("line")
+      .attr("x1", 0)
+      .attr("x2", this.width)
+      .attr("y1", this.yScale(100))
+      .attr("y2", this.yScale(100))
+      .attr("stroke", "gray")
+      .attr("stroke-width", 1)
+      .attr("stroke-dasharray", "5,5"); // Dashed line
+
+    // Add a label for the dashed line
+    this.svg.append("text")
+      .attr("x", 10) // Position label closer to the y-axis
+      .attr("y", this.yScale(100) - 5) // Position slightly above the line
+      .attr("text-anchor", "start")
+      .style("font-size", "12px")
+      .style("fill", "gray")
+      .text("Human Performance");
   }
 
   private createLegend(): void {
@@ -136,14 +164,12 @@ export class ReportsComponent implements OnInit, AfterViewInit {
     // Add each legend item with matching color
     this.reportData.forEach((benchmark: any) => {
       const color = this.color(benchmark.name); // Fetch color for the legend item
-      console.log(`Legend color for ${benchmark.name}: ${color}`); // Debug: Log the color
 
       const legendItem = legend.append("div").attr("class", "legend-item");
 
       legendItem.append("div")
         .attr("class", "legend-color-box")
         .style("background-color", color) // Apply color from color scale
-        .style("fill", color) // Backup for SVG and div elements
         .style("border", `1px solid ${color}`); // Additional border to reinforce visibility
 
       legendItem.append("span")
