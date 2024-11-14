@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment'; // Import environment
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChartService {
-  private apiUrl = 'http://localhost:3000/charts'; // Base URL for chart data
+  private apiUrl = `${environment.apiUrl}/charts`; // Use environment apiUrl and append /charts
 
   constructor(private http: HttpClient) {}
 
