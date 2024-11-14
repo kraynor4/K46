@@ -14,9 +14,9 @@ export class LoginComponent {
   username: string = '';
   password: string = '';
   loginError: boolean = false;
-  apiUrl: string = 'http://your-api-url.com'; // Define your API URL here
+  apiUrl: string = 'http://localhost:3000/auth'; // Define your API URL here
   constructor(private authService: AuthService, private router: Router, private http: HttpClient) {}
-  
+
 
 login(username: string, password: string): Observable<any> {
   return this.http.post<any>(`${this.apiUrl}/login`, { username, password }).pipe(

@@ -20,7 +20,7 @@ router.post('/login', (req, res) => {
   // Check if the provided username and password match the hardcoded credentials
   if (username === hardcodedUsername && password === hardcodedPassword) {
     // Generate JWT token
-    const token = jwt.sign({ username }, jwtSecret, { expiresIn: '1h' });
+    const token = jwt.sign({ username }, jwtSecret, { expiresIn: '30m' });
     console.log("Token generated:", token);
 
     // Send token back to the client
