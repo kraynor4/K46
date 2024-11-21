@@ -1,46 +1,36 @@
-//const https = require('https');
-//const fs = require('fs');
 const express = require('express');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const cors = require('cors');
-const authRoutes = require('./routes/auth');
-const chartRoutes = require('./routes/chartRoutes');
+const router = express.Router();
+const { MongoClient } = require('mongodb');
 
-// Initialize environment variables
-dotenv.config();
+// Define schemas (Optional if you don't want strict schema validation)
+const sumChartSchema = new mongoose.Schema({}, { collection: 'sum-chart' });
+const repChartSchema = new mongoose.Schema({}, { collection: 'rep-chart' });
 
-// Initialize Express app
-const app = express();
+// Create models for each collection
+const SumChart = mongoose.model('SumChart', sumChartSchema);
+const RepChart = mongoose.model('RepChart', repChartSchema);
 
-// Use CORS middleware to allow requests from https://localhost:4200
-app.use(cors({ origin: 'http://localhost:4200' }));
-
-// SSL certificate and key
-// const sslOptions = {
-//   key: fs.readFileSync('certs/server.key'),
-//   cert: fs.readFileSync('certs/server.cert')
-// };
-
-// Use express.json() to parse JSON bodies
-app.use(express.json());
-
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('Failed to connect to MongoDB:', err));
-
-// HTTPS server
-// https.createServer(sslOptions, app).listen(3000, () => {
-//   console.log('Secure backend running on port 3000');
-// });
-
-// Set up routes
-app.use('/auth', authRoutes);
-app.use('/charts', chartRoutes);
-
-// Start the HTTP server
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Backend running on http://localhost:${PORT}`);
+// Route to get data from sum-chart
+router.get('/sum-chart', async (req, res) => {
+  try {
+    const data = await SumChart.findOne(); // Fetch the first document in sum-chart
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching sum-chart data:', error);
+    res.status(500).json({ error: 'Failed to fetch sum-chart data' });
+  }
 });
+
+// Route to get data from rep-chart
+router.get('/rep-chart', async (req, res) => {
+  try {
+    const data = await RepChart.findOne(); // Fetch the first document in rep-chart
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching rep-chart data:', error);
+    res.status(500).json({ error: 'Failed to fetch rep-chart data' });
+  }
+});
+
+module.exports = router;

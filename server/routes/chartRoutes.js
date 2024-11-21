@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
+const { MongoClient } = require('mongodb');
 
 // Define schemas (Optional if you don't want strict schema validation)
 const sumChartSchema = new mongoose.Schema({}, { collection: 'sum-chart' });
