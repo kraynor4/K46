@@ -1,0 +1,60 @@
+// Screen reader only text
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+// Overall Layout Styling
+.dashboard-container {
+  padding: 20px;
+  background-color: #f8f8f8;
+  max-width: 800px;
+  margin: 0 auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+// Section Titles
+.section-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+// Paragraph Styling
+.dashboard-container p {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+// Reference URL Styling
+.reference-url {
+  font-size: 14px;
+  color: #007bff;
+  margin-top: 15px;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover {
+    color: #0056b3;
+    text-decoration: none;
+  }
+}
+
+// Body Text Styling
+.body-text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #666;
+  margin-top: 8px;
+  margin-bottom: 15px;
+}

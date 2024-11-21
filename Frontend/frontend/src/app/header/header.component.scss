@@ -1,0 +1,38 @@
+.top-menu {
+  display: flex;
+  justify-content: space-between;
+  background-color: #007bff;
+  padding: 10px;
+}
+
+.top-menu a,
+.top-menu button {
+  color: white;
+  margin-right: 10px;
+  text-decoration: none;
+  font-size: 16px; // Ensure text is readable
+  background-color: transparent; // Clear button background by default
+  border: none;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 5px; // Add a subtle round border
+
+  &:hover,
+  &:focus {
+    background-color: #0056b3; // Darker shade for better contrast when hovered/focused
+    outline: none; // Remove default outline for focus state
+    box-shadow: 0 0 2px 2px #80bdff; // Add a custom focus outline for accessibility
+  }
+}
+
+// Styling specifically for the logout button to improve visibility
+.top-menu button {
+  background-color: #dc3545; // Red background for logout
+  color: #fff; // White text for high contrast
+  font-weight: bold;
+
+  &:hover,
+  &:focus {
+    background-color: #c82333; // Darker shade of red for hover/focus
+  }
+}
